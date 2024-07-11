@@ -91,15 +91,11 @@ public class UserDaoImp implements UserDao {
       try (Session session = sessionFactory.openSession()) {
          transaction = session.beginTransaction();
          var query = session.createQuery("from User as user " +
-                 "join user.car as car " +
-                 "with car.series = :series AND car.model = :model ");
+                 "where user.car.series = :series AND user.car.model = :model ", User.class);
          query.setParameter("series", series);
          query.setParameter("model", model);
          query.setMaxResults(1);
-         Object[] u = (Object[]) query.uniqueResult();
-         user = (User) u[0];
-//         user = (User)u.get(0)[0];
-//         var u = query.addEntity(User.class).uniqueResult();
+         user = query.uniqueResult();
          transaction.commit();
       } catch (Exception e) {
          if (transaction != null && transaction.getStatus() == TransactionStatus.ACTIVE && transaction.getStatus() == TransactionStatus.MARKED_ROLLBACK) {
